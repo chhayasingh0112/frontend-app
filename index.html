@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Team Management App</title>
+</head>
+<body>
+  <h1>Team Management App</h1>
+
+  <h2>Create User</h2>
+  <form id="create-user-form">
+    <label for="username">Username:</label>
+    <input type="text" id="username" required>
+    <button type="submit">Create User</button>
+  </form>
+
+  <h2>Create Team</h2>
+  <form id="create-team-form">
+    <label for="teamname">Team Name:</label>
+    <input type="text" id="teamname" required>
+    <button type="submit">Create Team</button>
+  </form>
+
+  <h2>Create Relationship</h2>
+  <form id="create-relationship-form">
+    <label for="userid">User ID:</label>
+    <input type="text" id="userid" required>
+    <label for="teamid">Team ID:</label>
+    <input type="text" id="teamid" required>
+    <button type="submit">Create Relationship</button>
+  </form>
+
+  <h2>Users</h2>
+  <table id="user-table">
+    <tr>
+      <th>User ID</th>
+      <th>Username</th>
+    </tr>
+  </table>
+
+  <h2>Teams</h2>
+  <table id="team-table">
+    <tr>
+      <th>Team ID</th>
+      <th>Team Name</th>
+    </tr>
+  </table>
+
+  <h2>Relationships</h2>
+  <table id="relationship-table">
+    <tr>
+      <th>Relationship ID</th>
+      <th>User ID</th>
+      <th>Team ID</th>
+    </tr>
+  </table>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="app.js"></script>
+</body>
+  </html>
+  
