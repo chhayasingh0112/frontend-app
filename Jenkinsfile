@@ -1,10 +1,7 @@
 pipeline {
     agent any
     
-        environment {
-        registry = "chaya01/my_frontend_app"
-        registryCredential = 'dockerhub'
-    }
+      
     
     stages {
         stage('Checkout') {
@@ -14,29 +11,20 @@ pipeline {
             }
         }
         
-        stage('Build App Image') {
+    stage('Docker Build') {
+    	agent any
+         steps {
+      	   sh 'docker build -t chaya01/my_frontend_app:latest .'
+      }
+    }
+    stage('Docker Push') {
+    	agent any
           steps {
-            script {
-              dockerImage = docker.build registry + ":V$BUILD_NUMBER"
-            }
-          }
+      	    withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+        	sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+            sh 'docker push chaya01/my_frontend_app:latest'
         }
-
-        stage('Upload Image'){
-          steps{
-            script {
-              docker.withRegistry('', registryCredential) {
-                dockerImage.push("V$BUILD_NUMBER")
-                dockerImage.push('latest')
-              }
-            }
-          }
-        }
-        
-        stage('Remove Unused docker image') {
-          steps{
-            sh "docker rmi $registry:V$BUILD_NUMBER"
-          }
+      }
     }
   }
 }
