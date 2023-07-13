@@ -1,6 +1,11 @@
 pipeline {
     agent any
     
+        environment {
+        registry = "chaya01/my_frontend_app"
+        registryCredential = 'dockerhub'
+    }
+    
     stages {
         stage('Checkout') {
             steps {
@@ -9,29 +14,29 @@ pipeline {
             }
         }
         
-        stage('Dockerize') {
-            steps {
-                 // Create a Dockerfile for your frontend application
-                 sh '''
-                     echo "FROM nginx:latest" > Dockerfile
-                     echo "COPY index.html /usr/share/nginx/html" >> Dockerfile
-                     echo "COPY script.js /usr/share/nginx/html" >> Dockerfile
-                    '''
-                
-                // Build Docker image for your frontend application
-                sh 'docker build -t chaya01/frontend-app1 .'
-                // Tag the image with your Docker Hub username and repository name
+        stage('Build App Image') {
+          steps {
+            script {
+              dockerImage = docker.build registry + ":V$BUILD_NUMBER"
             }
+          }
+        }
+
+        stage('Upload Image'){
+          steps{
+            script {
+              docker.withRegistry('', registryCredential) {
+                dockerImage.push("V$BUILD_NUMBER")
+                dockerImage.push('latest')
+              }
+            }
+          }
         }
         
-      stage('Docker Push') {
-    	agent any
-      steps {
-      	withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
-        	sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
-          sh 'docker push shanem/spring-petclinic:latest'
-        }
-      }
+        stage('Remove Unused docker image') {
+          steps{
+            sh "docker rmi $registry:V$BUILD_NUMBER"
+          }
     }
   }
 }
