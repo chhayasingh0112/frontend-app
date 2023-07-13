@@ -14,7 +14,9 @@ pipeline {
     stage('Docker Build') {
     	agent any
          steps {
-      	   sh 'sudo -A docker build -t chaya01/my_frontend_app:latest .'
+            withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+        	sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+      	    sh 'docker build -t chaya01/my_frontend_app:latest .'
       }
     }
     stage('Docker Push') {
