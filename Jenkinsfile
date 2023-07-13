@@ -11,12 +11,12 @@ pipeline {
         
         stage('Dockerize') {
             steps {
-                // // Create a Dockerfile for your frontend application
-                // sh '''
-                //     echo "FROM nginx:latest" > Dockerfile
-                //     echo "COPY index.html /usr/share/nginx/html" >> Dockerfile
-                //     echo "COPY script.js /usr/share/nginx/html" >> Dockerfile
-                // '''
+                 // Create a Dockerfile for your frontend application
+                 sh '''
+                     echo "FROM nginx:latest" > Dockerfile
+                     echo "COPY index.html /usr/share/nginx/html" >> Dockerfile
+                     echo "COPY script.js /usr/share/nginx/html" >> Dockerfile
+                    '''
                 
                 // Build Docker image for your frontend application
                 sh 'docker build -t chaya01/frontend-app1 .'
@@ -24,15 +24,14 @@ pipeline {
             }
         }
         
-        stage('Push to Docker Hub') {
-            steps {
-                // Push the Docker image to Docker Hub
-                sh 'docker login -u chaya01 -p Riya@0112'
-                // Login to Docker Hub using your credentials
-                
-                sh 'docker push chaya01/frontend-app1'
-                // Push the image to Docker Hub repository
-            }
+      stage('Docker Push') {
+    	agent any
+      steps {
+      	withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+        	sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+          sh 'docker push shanem/spring-petclinic:latest'
         }
+      }
     }
+  }
 }
