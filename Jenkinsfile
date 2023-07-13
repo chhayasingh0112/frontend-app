@@ -1,43 +1,44 @@
 pipeline {
     agent any
     
-     environment {
+    environment {
         registry = "chaya01/frontend-app1"
         registryCredential = 'dockerhub'
     }
       
-    
     stages {
         stage('Checkout') {
             steps {
-                // Checkout your source code from version control system (e.g., Git)
                 git 'https://github.com/chhayasingh0112/frontend-app.git'
             }
         }
         
         stage('Build App Image') {
-          steps {
-            script {
-              dockerImage = docker.build registry + ":V$BUILD_NUMBER"
+            steps {
+                script {
+                    docker.withRegistry('', registryCredential) {
+                        def dockerImage = docker.build("${registry}:V${env.BUILD_NUMBER}")
+                        dockerImage.push()
+                    }
+                }
             }
-          }
         }
-
-        stage('Upload Image'){
-          steps{
-            script {
-              docker.withRegistry('', registryCredential) {
-                dockerImage.push("V$BUILD_NUMBER")
-                dockerImage.push('latest')
-              }
+        
+        stage('Upload Image') {
+            steps {
+                script {
+                    docker.withRegistry('', registryCredential) {
+                        def dockerImage = docker.image("${registry}:V${env.BUILD_NUMBER}")
+                        dockerImage.push('latest')
+                    }
+                }
             }
-          }
         }
-
-        stage('Remove Unused docker image') {
-          steps{
-            sh "docker rmi $registry:V$BUILD_NUMBER"
-          }
+        
+        stage('Remove Unused Docker Image') {
+            steps {
+                sh "docker rmi ${registry}:V${env.BUILD_NUMBER}"
+            }
         }
-  }
+    }
 }
