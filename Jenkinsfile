@@ -14,7 +14,7 @@ pipeline {
     stage('Docker Build') {
     	agent any
          steps {
-      	   sh 'sudo docker build -t chaya01/my_frontend_app:latest .'
+      	   sh 'echo <password> | sudo -S docker build -t chaya01/my_frontend_app:latest .'
       }
     }
     stage('Docker Push') {
